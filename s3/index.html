@@ -1,0 +1,29 @@
+<html>
+  <style>
+    body {
+      background-image: url('winter.jpg');
+    }
+    div#time {
+      font-size: 65px;
+    }
+    div#hello {
+      font-size: 70px;
+    }
+  </style>
+  <head>
+    <title>
+      Hello
+    </title>
+  </head>
+  <body>
+    <div align="center" id='hello'>Welcome to the upcoming season!!</div>
+    <div align="center" id='time'></div>
+
+    <script type="text/javascript">
+      var date = new Date();
+      var dateString = date.toDateString();
+      var time = date.toLocaleTimeString();
+      document.getElementById('time').innerHTML = dateString + ' ' + time;
+    </script>
+  </body>
+</html>

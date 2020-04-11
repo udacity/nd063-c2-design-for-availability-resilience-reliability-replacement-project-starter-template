@@ -13,7 +13,7 @@ Create active and standby VPCs
 In order to achieve the highest levels of durability and availability in AWS you must take advantage of multiple AWS regions.  The following will walk you through creating VPCs in multiple regions for this project.  Before you start, pick two AWS regions, one to be your “active” region, and one to be your “standby” region
 
 1. Log into AWS account
-2. Pick your “primary” region and set in AWS console
+2. Pick your “active” region and set in AWS console
 
   ![Select region](screenshots/regionSelect.png "Select region")
 
@@ -29,7 +29,7 @@ In order to achieve the highest levels of durability and availability in AWS you
     5. Next
 5. Fill in Stack name
 6. Name the VPC “Primary”
-7. Update the CIDR blocks
+7. Update the CIDR block of the VPC, and the CIDR blocks of the subnets.
 8. Click Next
 9. Click Next again
 10. Click Create stack
@@ -41,7 +41,7 @@ In order to achieve the highest levels of durability and availability in AWS you
 13. Now pick your “standby” region and switch to it in the AWS console.
 14. Repeat steps 3 through 12 using “Secondary” as the name of the VPC in step 6.  **NOTE:** Be sure to use a different network for the VPC in step 7.
 
-***SUBMIT screenshots of both VPCs after they are created***
+***SAVE screenshots of both VPCs after they are created.***
 
 
 ### Highly durable RDS Database
@@ -49,24 +49,28 @@ In order to achieve the highest levels of durability and availability in AWS you
     1. Choose the VPC in the current region that was just created (see step 12)
     2. Add the two private subnets by first selecting their Availability zone (see step 12)
 2. Be sure you’re in your primary region, and create a new database
+
 The database:
+- Choose "Standard Create"
 - Must be a MySQL database
-- Should be a “burstable” instance type
-- Should have “General Purpose” storage (no need for Provisioned IOPS)
+- Choose the "Production" template
+- Should be a “burstable” instance size
+- Should use “General Purpose” storage (no need for Provisioned IOPS)
 - Must be a Multi-AZ database
 - Must be in the newly created VPC in the newly created subnet group
 - Must have only the “UDARR-Database” security group
 - Must have an initial database called “udacity”
 - Must have automatic backups enabled for a period of 7 days
-3. Create a read replica database in the standby region (this is done from the active region)
+3. **In the active region**, create a "read replica".  **Choose the standby region as the location** (under "Network & Security")  
+
 	The read replica
 - Should be a “burstable” instance type
-- Must be in the newly created VPC in the newly created subnet group
+- Must be in the secondary VPC in the newly created subnet group
 - Must have only the “UDARR-Database” security group
 
-***SUBMIT screenshot of the configuration of the primary and read replica database after they are created***
+***SAVE screenshots of the configuration of the primary and read replica database after they are created.***
 
-***SUBMIT screenshot of the configuration of the database subnet groups as well as the route tables associated with those subnets***
+***SAVE screenshots of the configuration of the database subnet groups as well as the route tables associated with the database subnets.***
 
 
 ### Estimate availability of this configuration
@@ -77,12 +81,12 @@ Write a paragraph or two describing the achievable Recovery Time Objective (RTO)
 3. Minimum RPO for a single AZ outage
 4. Minimum RPO for a single region outage
 
-***SUBMIT your answers via a text file.***
+***SAVE your answers via a text file.***
 
 #### Demonstrate normal usage
 In the active region:
 1. Create an EC2 keypair in the region
-2. Launch an EC2 instance in the primary region
+2. Launch an EC2 instance in the active region
     1. Choose “Amazon Linux 2 AMI (HVM), SSD Volume Type”
     2. Launch the instance in the newly created VPC, in one of the public subnets
     3. Make sure “Auto-assign Public IP” is set to “Use subnet setting (Enable)”
@@ -114,7 +118,9 @@ INSERT INTO `orders`(`title`,`status`,`priority`,`description`)
 
 9. You have now demonstrated that you can read and write to the primary database
 
-***SUBMIT log of connecting to the database and running the above commands via a text file***
+***SAVE log of connecting to the database and running the above commands via a text file.***
+
+***SAVE screenshot of the database configuration now, before promoting the read replica database in the next step.***
 
 #### Monitor database
 
@@ -124,7 +130,7 @@ INSERT INTO `orders`(`title`,`status`,`priority`,`description`)
 
 2. Observe the “Replication” configuration with your multi-region read replica.  Note in particular the “Lag” (although without a sustained level of writes to the primary, this may not show data).
 
-***SUBMIT screenshot of the DB Connections and the database replication configuration***
+***SAVE screenshot of the DB Connections and the database replication configuration.***
 
   ![Replication](screenshots/replicationConfiguration.png "Replication")
 
@@ -151,7 +157,7 @@ INSERT INTO `orders`(`title`,`status`,`priority`,`description`)
 `SELECT * FROM orders;`
 8. You have now demonstrated that you can only read from the read replica database
 
-***SUBMIT log of connecting to the database and running the above commands via a text file***
+***SAVE log of connecting to the database and running the above commands via a text file.***
 
 9. Promote the read replica
 
@@ -167,9 +173,9 @@ INSERT INTO `orders`(`title`,`status`,`priority`,`description`)
 `SELECT * FROM orders;`
 13. You have now demonstrated that you can read and write the promoted database in the standby region
 
-***SUBMIT screenshots of the database configuration before and after the database promotion***
+***SAVE screenshots of the database configuration after the database promotion.***
 
-***SUBMIT log of connecting to the database and running the above commands via a text file***
+***SAVE log of connecting to the database and running the above commands via a text file.***
 
 
 ### Website recovery
@@ -190,7 +196,7 @@ You’re tasked with building a resilient static web hosting solution in AWS.  Y
 5. From the Properties tab, note the  “Static website hosting” Endpoint URL
 6. Paste URL into a web browser
 
-***SUBMIT screenshot of the webpage***
+***SAVE screenshot of the webpage.***
 
 You will now “accidentally” change the contents of the website such that it is no longer serving the correct content
 
@@ -198,14 +204,14 @@ You will now “accidentally” change the contents of the website such that it 
 2. Re-upload `index.html`
 3. Refresh web page
 
-***SUBMIT screenshot of the modified webpage***
+***SAVE screenshot of the modified webpage.***
 
 You will now need to “recover” the website by rolling the content back to a previous version.
 
 1. Recover the `index.html` object back to the original version
 2. Refresh web page
 
-***SUBMIT screenshot of the modified webpage***
+***SAVE screenshot of the modified webpage.***
 
 You will now “accidentally” delete contents from the S3 bucket
 
@@ -215,15 +221,15 @@ You will now “accidentally” delete contents from the S3 bucket
 
 2. Observe that the file is no longer present in the S3 folder and refresh the web page
 
-***SUBMIT screenshot of the modified webpage***
+***SAVE screenshot of the modified webpage.***
 
-***SUBMIT screenshot of existing versions of the file showing the "Deletion marker"***
+***SAVE screenshot of existing versions of the file showing the "Deletion marker".***
 
 You will now need to “recover” the object by removing the S3 Delete Marker version
 
 1. Recover the deleted object
 2. Refresh web page
 
-***SUBMIT screenshot of the modified webpage***
+***SAVE screenshot of the modified webpage.***
 
 ## License
